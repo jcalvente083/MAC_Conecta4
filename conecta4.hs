@@ -46,6 +46,7 @@ updateBoard board row col =
 
 main :: IO ()
 main = do
+    """
     -- Crear un archivo con un tablero vacío
     createEmptyBoard
 
@@ -67,3 +68,19 @@ main = do
 
     -- Escribir el nuevo tablero en el archivo
     writeBoard newBoard
+    
+    
+    """
+
+    -- Leer tablero hasta que cambie.
+
+    -- comprobar si el tablero esta lleno  o gano alguien -> SI -> FIN
+    -- NO:
+
+    -- obtener movimiento
+
+    -- realizar movimiento
+
+    -- actualizar tablero
+
+    --main

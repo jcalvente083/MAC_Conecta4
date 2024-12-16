@@ -1,4 +1,5 @@
 module Computer (playComputer) where
+
 import Board 
 
 -- |Cuenta secuencias consecutivas de n piezas del jugador i
