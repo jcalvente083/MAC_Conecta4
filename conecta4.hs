@@ -9,6 +9,14 @@ type Board = [[Int]]
 filePath :: FilePath
 filePath = "board_state.txt"
 
+-- Funcion para crear un tablero vacío
+emptyBoard :: Board
+emptyBoard = replicate 7 (replicate 6 0)
+
+-- Funcion para crear un archivo con un tablero vacío
+createEmptyBoard :: IO ()
+createEmptyBoard =  writeBoard emptyBoard
+
 -- Función para leer el estado del tablero desde un archivo
 readBoard :: IO Board
 readBoard = do
@@ -38,6 +46,9 @@ updateBoard board row col =
 
 main :: IO ()
 main = do
+    -- Crear un archivo con un tablero vacío
+    createEmptyBoard
+
     -- Obtener el tiempo de última modificación del archivo
     lastModTime <- getModificationTime filePath
 
