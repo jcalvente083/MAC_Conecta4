@@ -56,6 +56,3 @@ main = do
 
     -- Escribir el nuevo tablero en el archivo
     writeBoard newBoard
-
-
--- esto es una prueba
