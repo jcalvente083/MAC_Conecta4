@@ -5,12 +5,16 @@ from tkinter import messagebox
 
 class Conecta4App:
     def __init__(self, root):
+
         self.root = root
         self.root.title("Conecta 4")
         self.board = [[0 for _ in range(7)] for _ in range(6)]
         self.create_widgets()
         self.update_board()
-        self.player_turn = True  # Nueva variable para controlar el turno del jugador 1
+        self.save_board_state()
+        self.player_turn = True
+        self.last_mod_time = 0
+        
 
     def create_widgets(self):
         self.canvas = tk.Canvas(self.root, width=740, height=640, bg="blue")
@@ -18,7 +22,7 @@ class Conecta4App:
         self.canvas.bind("<Button-1>", self.handle_click)
 
     def handle_click(self, event):
-        if not self.player_turn:  # Si no es el turno del jugador 1, ignorar clics
+        if not self.player_turn: 
             return
         
         col = (event.x - 20) // 100
@@ -31,8 +35,8 @@ class Conecta4App:
                 return
 
             self.save_board_state()
-            self.player_turn = False  # Desactivar el turno del jugador 1
-            self.canvas.unbind("<Button-1>")  # Deshabilitar clics
+            self.player_turn = False  
+            self.canvas.unbind("<Button-1>")  
             self.root.after(1000, self.wait_for_player2_move)
 
     def make_move(self, col, player):
@@ -56,25 +60,25 @@ class Conecta4App:
         with open("board_state.txt", "w") as file:
             for row in self.board:
                 file.write(" ".join(map(str, row)) + "\n")
+        self.last_mod_time = os.path.getmtime("board_state.txt")
 
     def wait_for_player2_move(self):
-        last_mod_time = os.path.getmtime("board_state.txt")
         changed = False
         while not changed:
-            time.sleep(1)
             new_mod_time = os.path.getmtime("board_state.txt")
-            changed = new_mod_time != last_mod_time
+            changed = new_mod_time != self.last_mod_time
             if changed:
                 self.load_board_state()
                 self.update_board()
                 if self.check_winner(2):
                     messagebox.showinfo("Conecta 4", "¡Jugador 2 gana!")
                     self.reset_board()
-                self.player_turn = True  # Reactivar el turno del jugador 1
-                self.canvas.bind("<Button-1>", self.handle_click)  # Rehabilitar clics
+                self.player_turn = True  
+                self.canvas.bind("<Button-1>", self.handle_click)  
                 break
 
     def load_board_state(self):
+        
         with open("board_state.txt", "r") as file:
             for i, line in enumerate(file):
                 self.board[i] = list(map(int, line.strip().split()))
@@ -104,7 +108,7 @@ class Conecta4App:
         self.board = [[0 for _ in range(7)] for _ in range(6)]
         self.update_board()
         self.player_turn = True  # Asegurarse de que empieza el Jugador 1
-        self.canvas.bind("<Button-1>", self.handle_click)  # Rehabilitar clics
+        self.canvas.bind("<Button-1>", self.handle_click)  
 
 if __name__ == "__main__":
     root = tk.Tk()

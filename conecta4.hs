@@ -1,31 +1,32 @@
+module Conecta4 (
+    filePath,
+    readBoard,
+    writeBoard,
+    waitForFileChange
+    ) where 
 import System.Directory (getModificationTime)
 import Data.Time.Clock (UTCTime)
 import Control.Concurrent (threadDelay)
 
--- Tipo de dato para representar el tablero
-type Board = [[Int]]
-
+import Board
+    
 -- Ruta del archivo estática
 filePath :: FilePath
 filePath = "board_state.txt"
 
--- Funcion para crear un tablero vacío
-emptyBoard :: Board
-emptyBoard = replicate 7 (replicate 6 0)
-
 -- Funcion para crear un archivo con un tablero vacío
 createEmptyBoard :: IO ()
-createEmptyBoard =  writeBoard emptyBoard
+createEmptyBoard =  writeBoard nuevoTablero
 
 -- Función para leer el estado del tablero desde un archivo
-readBoard :: IO Board
+readBoard :: IO Tablero
 readBoard = do
     contents <- readFile filePath
     let board = map (map read . words) (lines contents)
     return board
 
 -- Función para escribir el estado del tablero en un archivo
-writeBoard :: Board -> IO ()
+writeBoard :: Tablero -> IO ()
 writeBoard board = do
     let contents = unlines (map (unwords . map show) board)
     writeFile filePath contents
@@ -39,48 +40,3 @@ waitForFileChange lastModTime = do
         then return ()
         else waitForFileChange lastModTime
 
--- Función para actualizar el tablero con un nuevo movimiento del jugador 2
-updateBoard :: Board -> Int -> Int -> Board
-updateBoard board row col = 
-    take row board ++ [take col (board !! row) ++ [2] ++ drop (col + 1) (board !! row)] ++ drop (row + 1) board
-
-main :: IO ()
-main = do
-    """
-    -- Crear un archivo con un tablero vacío
-    createEmptyBoard
-
-    -- Obtener el tiempo de última modificación del archivo
-    lastModTime <- getModificationTime filePath
-
-    -- Esperar hasta que el archivo haya cambiado
-    waitForFileChange lastModTime
-
-    -- Leer el tablero desde el archivo
-    board <- readBoard
-    print board
-    
-    threadDelay 1000000
-    
-    -- Actualizar el tablero con un nuevo movimiento del jugador 2 (por ejemplo, en la posición (5, 3))
-    let newBoard = updateBoard board 5 3
-    print newBoard
-
-    -- Escribir el nuevo tablero en el archivo
-    writeBoard newBoard
-    
-    
-    """
-
-    -- Leer tablero hasta que cambie.
-
-    -- comprobar si el tablero esta lleno  o gano alguien -> SI -> FIN
-    -- NO:
-
-    -- obtener movimiento
-
-    -- realizar movimiento
-
-    -- actualizar tablero
-
-    --main
