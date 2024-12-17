@@ -27,18 +27,18 @@ localizarCoord i x y (l:ls) = l : localizarCoord i (x-1) y ls
 localizarCoord _ _ _ []     = []
 
 -- |Agrega al jugador i en la parte inferior de una columna
-añadirEnColumna :: Int -> [Int] -> [Int]
-añadirEnColumna i [] = [] -- Convención: No debería suceder
-añadirEnColumna i (x:xs)
+addEnColumna :: Int -> [Int] -> [Int]
+addEnColumna i [] = [] -- Convención: No debería suceder
+addEnColumna i (x:xs)
   | x == 0    = i:xs
-  | otherwise = x : añadirEnColumna i xs
+  | otherwise = x : addEnColumna i xs
 
 -- |Coloca al jugador i en una columna específica del tablero
 localizar :: Int -> Int -> Tablero -> Tablero
 localizar _ _ [] = [] -- Convención
 localizar i 0 (x:xs)
   | lineaCompleta x = x:xs
-  | otherwise    = añadirEnColumna i x : xs
+  | otherwise    = addEnColumna i x : xs
 localizar i c (x:xs) = x : localizar i (c-1) xs
 
 -- |Verifica si una línea (columna) está llena

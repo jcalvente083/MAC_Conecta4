@@ -10,23 +10,30 @@ class Conecta4App:
         self.board = [[0 for _ in range(7)] for _ in range(6)]
         self.create_widgets()
         self.update_board()
+        self.player_turn = True  # Nueva variable para controlar el turno del jugador 1
 
     def create_widgets(self):
-        self.canvas = tk.Canvas(self.root, width=740, height=640, bg="blue")  # Añadido margen
-        self.canvas.pack(padx=20, pady=20)  # Añadido margen
+        self.canvas = tk.Canvas(self.root, width=740, height=640, bg="blue")
+        self.canvas.pack(padx=20, pady=20)
         self.canvas.bind("<Button-1>", self.handle_click)
 
     def handle_click(self, event):
-        col = (event.x - 20) // 100  # Ajuste por el margen
-        if 0 <= col < 7:  # Asegurarse de que el clic esté dentro del tablero
-            self.make_move(col, 1)  # Movimiento del jugador 1
+        if not self.player_turn:  # Si no es el turno del jugador 1, ignorar clics
+            return
+        
+        col = (event.x - 20) // 100
+        if 0 <= col < 7:
+            self.make_move(col, 1)
             self.update_board()
             if self.check_winner(1):
                 messagebox.showinfo("Conecta 4", "¡Jugador 1 gana!")
                 self.reset_board()
                 return
+
             self.save_board_state()
-            self.root.after(1000, self.wait_for_player2_move)  # Esperar 1 segundo antes de comprobar el movimiento del jugador 2
+            self.player_turn = False  # Desactivar el turno del jugador 1
+            self.canvas.unbind("<Button-1>")  # Deshabilitar clics
+            self.root.after(1000, self.wait_for_player2_move)
 
     def make_move(self, col, player):
         for row in reversed(range(6)):
@@ -38,8 +45,8 @@ class Conecta4App:
         self.canvas.delete("all")
         for row in range(6):
             for col in range(7):
-                x0 = col * 100 + 20  # Ajuste por el margen
-                y0 = row * 100 + 20  # Ajuste por el margen
+                x0 = col * 100 + 20
+                y0 = row * 100 + 20
                 x1 = x0 + 100
                 y1 = y0 + 100
                 color = "white" if self.board[row][col] == 0 else ("red" if self.board[row][col] == 1 else "yellow")
@@ -54,7 +61,7 @@ class Conecta4App:
         last_mod_time = os.path.getmtime("board_state.txt")
         changed = False
         while not changed:
-            time.sleep(1)  # Esperar 1 segundo antes de comprobar de nuevo
+            time.sleep(1)
             new_mod_time = os.path.getmtime("board_state.txt")
             changed = new_mod_time != last_mod_time
             if changed:
@@ -63,6 +70,8 @@ class Conecta4App:
                 if self.check_winner(2):
                     messagebox.showinfo("Conecta 4", "¡Jugador 2 gana!")
                     self.reset_board()
+                self.player_turn = True  # Reactivar el turno del jugador 1
+                self.canvas.bind("<Button-1>", self.handle_click)  # Rehabilitar clics
                 break
 
     def load_board_state(self):
@@ -71,7 +80,6 @@ class Conecta4App:
                 self.board[i] = list(map(int, line.strip().split()))
 
     def check_winner(self, player):
-        # Comprobar filas, columnas y diagonales
         for row in range(6):
             for col in range(7):
                 if self.check_line(player, row, col, 1, 0) or \
@@ -95,6 +103,8 @@ class Conecta4App:
     def reset_board(self):
         self.board = [[0 for _ in range(7)] for _ in range(6)]
         self.update_board()
+        self.player_turn = True  # Asegurarse de que empieza el Jugador 1
+        self.canvas.bind("<Button-1>", self.handle_click)  # Rehabilitar clics
 
 if __name__ == "__main__":
     root = tk.Tk()
