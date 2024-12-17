@@ -23,11 +23,13 @@ main = do
             -- Jugar IA
 
             putStrLn "Jugando IA..."
-            let nuevoBoard = jugarIA 3 boardActual
+            let nuevoBoard = jugarIA 10 boardActual
             putStrLn "IA ha jugado"
 
+            print nuevoBoard
             -- Guardar el nuevo estado del tablero
             writeBoard nuevoBoard
+            
 
             if haFinalizado nuevoBoard
                 then return ()

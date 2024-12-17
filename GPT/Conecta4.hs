@@ -20,12 +20,12 @@ readBoard :: IO Tablero
 readBoard = do
     contents <- readFile filePath
     let board = map (map read . words) (lines contents)
-    return (transponer board)
-
+    return board
+    
 writeBoard :: Tablero -> IO ()
 writeBoard board = do
 
-    let contents = unlines (map (unwords . map show) (transponer board))
+    let contents = unlines (map (unwords . map show) board)
     writeFile filePath contents
 
 waitForFileChange :: UTCTime -> IO ()

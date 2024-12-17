@@ -58,10 +58,14 @@ class Conecta4App:
 
     def save_board_state(self):
         with open("board_state.txt", "w") as file:
-            for row in self.board:
-                file.write(" ".join(map(str, row)) + "\n")
-        self.last_mod_time = os.path.getmtime("board_state.txt")
-
+            # Iterar por columnas (de izquierda a derecha)
+            for col in range(len(self.board[0])):  # Iterar sobre las columnas del tablero
+                # Recoger los valores de la columna de abajo hacia arriba
+                column_values = [str(self.board[row][col]) for row in reversed(range(len(self.board)))]
+                file.write(" ".join(column_values) + "\n")
+        
+            
+        
     def wait_for_player2_move(self):
         changed = False
         while not changed:
@@ -70,6 +74,7 @@ class Conecta4App:
             if changed:
                 self.load_board_state()
                 self.update_board()
+                self.last_mod_time = new_mod_time 
                 if self.check_winner(2):
                     messagebox.showinfo("Conecta 4", "¡Jugador 2 gana!")
                     self.reset_board()
@@ -77,11 +82,30 @@ class Conecta4App:
                 self.canvas.bind("<Button-1>", self.handle_click)  
                 break
 
+
     def load_board_state(self):
-        
         with open("board_state.txt", "r") as file:
-            for i, line in enumerate(file):
-                self.board[i] = list(map(int, line.strip().split()))
+            lines = [line.strip().split() for line in file if line.strip()]  # Leer y limpiar líneas vacías
+
+        # Verificar que el archivo tenga dimensiones válidas
+        expected_rows = 6
+        expected_cols = 7
+
+        if len(lines) != expected_cols or any(len(line) != expected_rows for line in lines):
+            raise ValueError("El archivo board_state.txt no tiene el formato correcto.")
+
+        # Inicializar el tablero con dimensiones correctas (6 filas, 7 columnas)
+        self.board = [[0 for _ in range(expected_cols)] for _ in range(expected_rows)]
+
+        # Rellenar el tablero con las columnas invertidas verticalmente
+        for col in range(expected_cols):
+            for row in range(expected_rows):
+                # Asignar valores de la columna del archivo a las filas del tablero (invertidas)
+                self.board[expected_rows - 1 - row][col] = int(lines[col][row])
+
+        self.last_mod_time = os.path.getmtime("board_state.txt")
+
+
 
     def check_winner(self, player):
         for row in range(6):
